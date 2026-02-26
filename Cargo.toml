@@ -1,0 +1,30 @@
+
+[package]
+name = "phased_array"
+version = "0.1.0"
+edition = "2021"
+description = "Simple two-antenna phased-array aligner"
+
+[dependencies]
+clap = { version = "4.5.47", features = ["derive"] }
+num-complex = "0.4.6"
+rustfft = "6.4.0"
+plotters = "0.3.7"
+libc = "0.2.175"
+rayon = "1.11.0"
+astro = "2.0.0"
+nav-types = "0.5.2"
+ndarray = "0.15.6"
+realfft = "3.5.0"
+roxmltree = "0.20.0"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true
+debug = false
+debug-assertions = false
+overflow-checks = false
+incremental = false
