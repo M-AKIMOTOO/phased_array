@@ -1568,8 +1568,6 @@ fn main() -> Result<(), DynError> {
                             accumulate_power_add(&mut acc_auto1, &s1_complex_half);
                             accumulate_power_add(&mut acc_auto2, &s2_complex_half);
 
-                            let frame_idx_global =
-                                block_start_frame_idx + base_frame_idx + local_idx;
                             let frame_time_since_block_start =
                                 (base_frame_idx + local_idx) as f64 * seconds_per_frame_for_corr;
 
@@ -1902,7 +1900,11 @@ fn main() -> Result<(), DynError> {
             let total_seconds = total_duration_s.ceil() as usize;
             if total_seconds > 0 {
                 let total_seconds = total_seconds.max(1);
-                println!("[info] Geometric delay per second (ant2 - ant1):");
+                let geom_log_path = output_dir.join(format!("YAMAGU66_{}_geometricdelay.txt", cor_epoch_tag));
+                let mut geom_file = File::create(&geom_log_path)?;
+                writeln!(geom_file, "# Geometric delay per second (ant2 - ant1)")?;
+                writeln!(geom_file, "# sec  delay_seconds  samples")?;
+                
                 for sec in 0..total_seconds {
                     let mjd = info.initial_mjd + sec as f64 / 86400.0;
                     let (_, _, geom_delay, _, _) = geom::calculate_geometric_delay_and_derivatives(
@@ -1912,18 +1914,17 @@ fn main() -> Result<(), DynError> {
                         info.dec_rad,
                         mjd,
                     );
-                    let base_samples = geom_delay * sampling_rate_hz;
                     let adjusted_delay = geom_delay + args.gico3_correct;
                     let adjusted_samples = adjusted_delay * sampling_rate_hz;
-                    println!(
-                        "  t+{:>3} s: base {:.9e} s ({:.3} samples) | +gico3 {:.9e} s ({:.3} samples)",
+                    writeln!(
+                        geom_file,
+                        "{:>4}  {:.9e}  {:.3}",
                         sec,
-                        geom_delay,
-                        base_samples,
                         adjusted_delay,
                         adjusted_samples
-                    );
+                    )?;
                 }
+                println!("[info] Detailed geometric delay log saved to {}", geom_log_path.display());
             }
         }
 
@@ -2494,12 +2495,10 @@ fn main() -> Result<(), DynError> {
                 100.0
             };
             println!(
-                "[info] Synthesised second {}/{} ({:.2}%: {:.6} / {:.6} s)",
+                "[info] Synthesised second {}/{} ({:.2}%)",
                 second_index + 1,
                 total_seconds_target,
-                percentage,
-                processed_seconds,
-                total_duration_s
+                percentage
             );
             while chunk_queue.len() < RAM_SECONDS_BUFFER
                 && next_second_to_load < second_frame_counts.len()
