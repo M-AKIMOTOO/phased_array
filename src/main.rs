@@ -1470,10 +1470,30 @@ fn main() -> Result<(), DynError> {
             let frames_in_block = read_buffer1.len() / bytes_per_frame;
             let block_start_frame_idx = processed_frames;
 
-            // Calculate these values for the current block
-            let block_current_geometric_delay_s = geometric_delay_s_initial;
-            let block_current_geometric_rate_s = geometric_rate_s_initial;
-            let block_current_geometric_accel_s = geometric_accel_s_initial;
+            // Calculate geometric parameters for the current block start time
+            let (
+                block_current_geometric_delay_s,
+                block_current_geometric_rate_s,
+                block_current_geometric_accel_s,
+            ) = if let Some(info) = geom_debug_info {
+                let block_start_time_s = block_start_frame_idx as f64 * seconds_per_frame;
+                let block_mjd = info.initial_mjd + block_start_time_s / 86400.0;
+                let (_, _, geom_delay, geom_rate, geom_accel) =
+                    geom::calculate_geometric_delay_and_derivatives(
+                        geom::YAMAGU32_ECEF,
+                        geom::YAMAGU34_ECEF,
+                        info.ra_rad,
+                        info.dec_rad,
+                        block_mjd,
+                    );
+                (geom_delay, geom_rate, geom_accel)
+            } else {
+                (
+                    geometric_delay_s_initial,
+                    geometric_rate_s_initial,
+                    geometric_accel_s_initial,
+                )
+            };
 
             let (block_cross_spec_sum, block_auto_spec1_sum, block_auto_spec2_sum): (
                 Vec<Complex<f64>>,
@@ -1550,8 +1570,8 @@ fn main() -> Result<(), DynError> {
 
                             let frame_idx_global =
                                 block_start_frame_idx + base_frame_idx + local_idx;
-                            let frame_time_since_start =
-                                (frame_idx_global as f64 + 0.5) * seconds_per_frame_for_corr;
+                            let frame_time_since_block_start =
+                                (base_frame_idx + local_idx) as f64 * seconds_per_frame_for_corr;
 
                             let total_delay_diff = (block_current_geometric_delay_s
                                 + coarse_delay_s_for_corr
@@ -1576,7 +1596,7 @@ fn main() -> Result<(), DynError> {
                                 ref_delay_s,
                                 ref_rate_sps,
                                 ref_accel_sps2,
-                                frame_time_since_start,
+                                frame_time_since_block_start,
                             );
 
                             match delay_reference_for_corr {
@@ -1587,7 +1607,7 @@ fn main() -> Result<(), DynError> {
                                     total_delay_diff,
                                     total_rate_diff,
                                     total_accel_diff,
-                                    frame_time_since_start,
+                                    frame_time_since_block_start,
                                 ),
                                 DelayReference::Ant1 => apply_delay_and_rate_regular_bins(
                                     &mut s2_complex_half,
@@ -1596,7 +1616,7 @@ fn main() -> Result<(), DynError> {
                                     -total_delay_diff,
                                     -total_rate_diff,
                                     -total_accel_diff,
-                                    frame_time_since_start,
+                                    frame_time_since_block_start,
                                 ),
                             }
 
@@ -2025,12 +2045,34 @@ fn main() -> Result<(), DynError> {
             );
             let raw_block1 = chunk.raw1;
             let raw_block2 = chunk.raw2;
+
+            // Update geometric model for the current second chunk
+            let (current_geom_delay, current_geom_rate, current_geom_accel) =
+                if let Some(info) = geom_debug_info {
+                    let second_start_time_s = second_start_frame as f64 * seconds_per_frame;
+                    let second_mjd = info.initial_mjd + second_start_time_s / 86400.0;
+                    let (_, _, gd, gr, ga) = geom::calculate_geometric_delay_and_derivatives(
+                        geom::YAMAGU32_ECEF,
+                        geom::YAMAGU34_ECEF,
+                        info.ra_rad,
+                        info.dec_rad,
+                        second_mjd,
+                    );
+                    (gd, gr, ga)
+                } else {
+                    (
+                        geom_delay_fixed,
+                        geom_rate_fixed,
+                        geom_accel_fixed,
+                    )
+                };
+
             let mut second_encoded = vec![0u8; frames_this_second * bytes_per_frame];
             let base_total_delay_diff =
-                (geom_delay_fixed + coarse_delay_s + clock_delay_s + residual_delay_s)
+                (current_geom_delay + coarse_delay_s + clock_delay_s + residual_delay_s)
                     - delay_applied_by_seek_s;
-            let base_total_rate_diff = geom_rate_fixed + fixed_rate_delay_s_per_s;
-            let base_total_accel_diff = geom_accel_fixed;
+            let base_total_rate_diff = current_geom_rate + fixed_rate_delay_s_per_s;
+            let base_total_accel_diff = current_geom_accel;
 
             let make_synth_work_buffers = || SynthWorkBuffers {
                 frame1_f64: vec![0.0f64; args.fft],
@@ -2060,9 +2102,9 @@ fn main() -> Result<(), DynError> {
                      (batch_idx, ((raw1_batch, raw2_batch), encoded_batch))| {
                         let decode_plan_for_synth = Arc::clone(&decode_plan_for_synth);
                         let base_frame_idx_in_second = batch_idx * frames_per_batch_synth;
-                        let frame_time_since_start =
-                            (second_start_frame + base_frame_idx_in_second) as f64 * seconds_per_frame
-                                + 0.5 * seconds_per_frame;
+                        let frame_time_within_second =
+                            base_frame_idx_in_second as f64 * seconds_per_frame;
+
                         let total_delay_diff = base_total_delay_diff;
                         let total_rate_diff = base_total_rate_diff;
                         let total_accel_diff = base_total_accel_diff;
@@ -2089,7 +2131,7 @@ fn main() -> Result<(), DynError> {
                             fringe_delay_s,
                             fringe_rate_sps,
                             fringe_accel_sps2,
-                            frame_time_since_start,
+                            frame_time_within_second,
                             seconds_per_frame,
                         );
                         let mut bin_step_rec = PhaseRotationRecurrence::new(
@@ -2097,10 +2139,10 @@ fn main() -> Result<(), DynError> {
                             apply_delay_s,
                             apply_rate_sps,
                             apply_accel_sps2,
-                            frame_time_since_start,
+                            frame_time_within_second,
                             seconds_per_frame,
                         );
-                        let mut frame_time_s = frame_time_since_start;
+                        let mut frame_time_s = frame_time_within_second;
                         const PHASE_REBASE_INTERVAL: usize = 4096;
 
                         for (local_idx, (raw1, raw2)) in raw1_batch

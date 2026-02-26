@@ -256,7 +256,7 @@ fn calculate_single_antenna_delay(
     let ha = gast - ra; // Greenwich Hour Angle
 
     let s_x = dec.cos() * ha.cos();
-    let s_y = dec.cos() * ha.sin();
+    let s_y = -1.0 * dec.cos() * ha.sin();
     let s_z = dec.sin();
 
     -1.0 * (ant_xyz[0] * s_x + ant_xyz[1] * s_y + ant_xyz[2] * s_z) / C
@@ -276,7 +276,7 @@ fn calculate_baseline_delay(
     let ha = gast - ra;
 
     let s_x = dec.cos() * ha.cos();
-    let s_y = dec.cos() * ha.sin();
+    let s_y = -1.0 * dec.cos() * ha.sin();
     let s_z = dec.sin();
 
     let bx = ant2_xyz[0] - ant1_xyz[0];
