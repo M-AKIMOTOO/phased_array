@@ -1,9 +1,13 @@
 
 [package]
 name = "phased_array"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
 description = "Simple two-antenna phased-array aligner"
+authors = ["Masanori AKIMOTO"]
+repository = "https://github.com/M-AKIMOTOO/phased_array/tree/main"
+license = "MIT"
+readme = "README.md"
 
 [dependencies]
 clap = { version = "4.5.47", features = ["derive"] }
