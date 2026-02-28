@@ -1,5 +1,5 @@
 use std::cmp::Ordering;
-
+use std::path::Path;
 use num_complex::Complex;
 
 use crate::plot::{plot_multi_series_f64_x, plot_series_f64_x, plot_series_with_x, BLUE, GREEN};
@@ -16,10 +16,12 @@ pub fn finalize_cross_spectrum(
     fft_len: usize,
     half_spec_len: usize,
     lags: &[i32],
-    freqs_mhz: &[f64],
+    sampling_rate_hz: f64,
+    sky_low_mhz: f64,
     invert_lag_axis: bool,
+    output_dir: &Path,
+    is_lsb: bool,
 ) -> Result<CrossSpectrumResult, DynError> {
-    // Data is already in analysis sideband (default: USB via decode path), so no spectral reversal is needed.
     // Zero out DC component (now at index 0) and the original DC component (shifted to Nyquist).
     accumulated_cross_spec[0] = Complex::new(0.0, 0.0);
     if fft_len / 2 < accumulated_cross_spec.len() {
@@ -48,6 +50,16 @@ pub fn finalize_cross_spectrum(
     } else {
         phase_spectrum_rad.clone()
     };
+
+    let bw_mhz = sampling_rate_hz / 2.0 / 1e6;
+    let df_hz = sampling_rate_hz / fft_len as f64;
+    let freqs_mhz: Vec<f64> = (0..accumulated_cross_spec.len())
+        .map(|i| {
+            if is_lsb { (sky_low_mhz + bw_mhz) - (i as f64 * df_hz) / 1e6 }
+            else { sky_low_mhz + (i as f64 * df_hz) / 1e6 }
+        })
+        .collect();
+
     let freqs_hz: Vec<f64> = freqs_mhz.iter().map(|f| f * 1.0e6).collect();
 
     let (phase_fit_line_rad, delay_seconds_from_phase) = if freqs_hz.len()
@@ -74,7 +86,6 @@ pub fn finalize_cross_spectrum(
             if denominator.abs() > 1e-9 {
                 let slope = (n * sum_xy - sum_x * sum_y) / denominator;
                 let intercept = (sum_y - slope * sum_x) / n;
-                // Correct formula for USB data
                 let delay = -slope / (2.0 * PI);
                 let fit_line: Vec<f64> = freqs_hz
                     .iter()
@@ -102,7 +113,7 @@ pub fn finalize_cross_spectrum(
     let phase_plot_freqs: &[f64] = if freqs_mhz.len() > 1 {
         &freqs_mhz[1..]
     } else {
-        freqs_mhz
+        &freqs_mhz
     };
     let phase_plot_deg: Vec<f64> = if phase_spectrum_deg.len() > 1 {
         phase_spectrum_deg[1..].to_vec()
@@ -136,27 +147,32 @@ pub fn finalize_cross_spectrum(
         .zip(mag_spectrum.iter())
         .max_by(|(_, &a), (_, &b)| a.partial_cmp(&b).unwrap_or(std::cmp::Ordering::Equal))
         .unwrap_or((&0.0, &0.0));
+
+    let mag_path = output_dir.join(format!("xcf_spectrum_magnitude_fft{}.png", fft_len));
     plot_series_f64_x(
-        freqs_mhz,
+        &freqs_mhz,
         &mag_spectrum,
         &format!("Cross-Spectrum Magnitude (peak {:.3} MHz)", peak_freq_mhz),
-        &format!("cross_spectrum_magnitude_fft{}.png", fft_len),
+        &mag_path.to_string_lossy(),
         "Frequency (MHz)",
         "Magnitude",
         Some((0.0, mag_upper)),
         &format!("Cross-Spectrum (peak {:.3} MHz)", peak_freq_mhz),
     )?;
+
+    let phs_path = output_dir.join(format!("xcf_spectrum_phase_fft{}.png", fft_len));
     plot_series_f64_x(
         phase_plot_freqs,
         &phase_plot_deg,
         "Cross-Spectrum Phase",
-        &format!("cross_spectrum_phase_fft{}.png", fft_len),
+        &phs_path.to_string_lossy(),
         "Frequency (MHz)",
         "Phase (degrees)",
         None,
         "Cross-Spectrum Phase",
     )?;
 
+    let unw_path = output_dir.join(format!("xcf_spectrum_unwrapped_phase_fft{}.png", fft_len));
     if !phase_fit_plot_deg.is_empty() {
         let fit_label = if let Some(delay) = delay_seconds_from_phase {
             format!("Linear fit (delay {:.3e} s)", delay)
@@ -174,7 +190,7 @@ pub fn finalize_cross_spectrum(
                 (&phase_fit_plot_deg, &GREEN, &fit_label),
             ],
             "Cross-Spectrum Unwrapped Phase (fit excludes DC/Nyquist)",
-            &format!("cross_spectrum_unwrapped_phase_fft{}.png", fft_len),
+            &unw_path.to_string_lossy(),
             "Frequency (MHz)",
             "Unwrapped Phase (degrees)",
             None,
@@ -184,7 +200,7 @@ pub fn finalize_cross_spectrum(
             phase_plot_freqs,
             &unwrapped_phase_plot_deg,
             "Cross-Spectrum Unwrapped Phase (DC removed)",
-            &format!("cross_spectrum_unwrapped_phase_fft{}.png", fft_len),
+            &unw_path.to_string_lossy(),
             "Frequency (MHz)",
             "Unwrapped Phase (degrees)",
             None,
@@ -210,7 +226,6 @@ pub fn finalize_cross_spectrum(
     helper.inverse_c2c(&mut full_cross_spec)?; // IFFT
     let cross_corr_mag: Vec<f64> = full_cross_spec.iter().map(|c| c.norm()).collect();
 
-    // Use the shift amount that correctly centers the ACF plots
     let shift = fft_len / 2;
     let cross_corr_mag_shifted: Vec<f64> = cross_corr_mag
         .iter()
@@ -239,20 +254,18 @@ pub fn finalize_cross_spectrum(
         Some(top_points.as_slice())
     };
 
-    let lags_plot = lags_display.clone();
-    let corr_plot = cross_corr_mag_shifted.clone();
-
-    let y_upper = corr_plot
+    let corr_path = output_dir.join(format!("xcf_correlation_magnitude_fft{}.png", fft_len));
+    let y_upper = cross_corr_mag_shifted
         .iter()
         .copied()
         .fold(0.0_f64, |acc, v| if v > acc { v } else { acc });
     let y_upper = if y_upper > 0.0 { y_upper * 1.05 } else { 1.0 };
 
     plot_series_with_x(
-        &lags_plot,
-        &[(&corr_plot, &BLUE)],
+        &lags_display,
+        &[(&cross_corr_mag_shifted, &BLUE)],
         "Cross-Correlation Magnitude",
-        &format!("cross_correlation_magnitude_fft{}.png", fft_len),
+        &corr_path.to_string_lossy(),
         "Lag (samples, fftshifted)",
         "Magnitude",
         Some((0.0, y_upper)),
@@ -267,7 +280,7 @@ pub fn finalize_cross_spectrum(
     // --- SNR Calculation ---
     if let Some(&(peak_lag, peak_val)) = peaks.first() {
         let exclusion_zone = 20;
-        let noise_mags: Vec<f64> = lags
+        let noise_mags: Vec<f64> = lags_display
             .iter()
             .zip(cross_corr_mag_shifted.iter())
             .filter(|(&l, _)| (l - peak_lag).abs() > exclusion_zone)

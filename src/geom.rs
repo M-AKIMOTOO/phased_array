@@ -1,4 +1,5 @@
 use crate::utils::DynError;
+use erfa::aliases::{eraAnp, eraC2s, eraGmst06, eraGst06a, eraPmat06, eraRxp, eraS2c};
 
 const C: f64 = 299792458.0; // Speed of light in m/s
 
@@ -17,7 +18,7 @@ pub const YAMAGU34_ECEF: [f64; 3] = [-3502567.576, 3950885.734, 3566449.115];
 //   tau_baseline = tau_2 - tau_1
 // ----------------------------------
 
-fn parse_packed_hhmmss(value: f64) -> Result<(f64, f64, f64), DynError> {
+fn parse_packed_hhmmss(value: f64) -> Result<(f64, f64, f64), DynError> { 
     let abs = value.abs();
     let h = (abs / 10000.0).floor();
     let rem = abs - h * 10000.0;
@@ -186,6 +187,48 @@ fn parse_iso_epoch_to_mjd(epoch_str: &str) -> Result<f64, DynError> {
     Ok(julian_day - 2400000.5) // Convert to MJD
 }
 
+fn is_leap_year(year: i32) -> bool {
+    (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
+}
+
+fn doy_to_month_day(year: i32, doy: u32) -> Result<(u32, u32), DynError> {
+    let month_days = if is_leap_year(year) {
+        [31u32, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    } else {
+        [31u32, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    };
+    let max_doy: u32 = month_days.iter().sum();
+    if doy == 0 || doy > max_doy {
+        return Err("DOY out of range".into());
+    }
+    let mut rem = doy;
+    for (idx, md) in month_days.iter().enumerate() {
+        if rem <= *md {
+            return Ok(((idx + 1) as u32, rem));
+        }
+        rem -= *md;
+    }
+    Err("Failed to convert DOY to month/day".into())
+}
+
+fn parse_year_doy_epoch_to_mjd(epoch_str: &str) -> Result<f64, DynError> {
+    // Supports formats like:
+    //   YYYY/DDD
+    //   YYYY/DDD HH:MM:SS
+    //   YYYY/DDD HH:MM:SS.sss
+    let mut it = epoch_str.split_whitespace();
+    let date_part = it.next().ok_or("Invalid YYYY/DDD epoch: missing date")?;
+    let time_part = it.next().unwrap_or("00:00:00");
+    let (y_str, ddd_str) = date_part
+        .split_once('/')
+        .ok_or("Invalid YYYY/DDD epoch: expected '/'")?;
+    let year = y_str.parse::<i32>()?;
+    let doy = ddd_str.parse::<u32>()?;
+    let (month, day) = doy_to_month_day(year, doy)?;
+    let iso = format!("{year:04}-{month:02}-{day:02}T{time_part}Z");
+    parse_iso_epoch_to_mjd(&iso)
+}
+
 // Parse epoch to MJD.
 // Supports:
 // - ISO datetime (e.g. 2024-02-12T15:52:00Z)
@@ -195,6 +238,9 @@ pub fn parse_epoch_to_mjd(epoch_str: &str) -> Result<f64, DynError> {
     let raw = epoch_str.trim();
     if raw.is_empty() {
         return Err("Empty epoch".into());
+    }
+    if raw.contains('/') {
+        return parse_year_doy_epoch_to_mjd(raw);
     }
     if raw.contains('-')
         || raw.contains('T')
@@ -222,26 +268,40 @@ pub fn parse_epoch_to_mjd(epoch_str: &str) -> Result<f64, DynError> {
     Err("Unsupported epoch format. Use ISO datetime, MJD, or year (e.g. 2000)".into())
 }
 
+fn mjd_to_jd_split(mjd: f64) -> (f64, f64) {
+    // Keep MJD as the second part to preserve precision in downstream ERFA calls.
+    (2400000.5, mjd)
+}
+
+/// Precess J2000 mean RA/Dec to mean equator/equinox of date.
+/// Uses ERFA IAU 2006 precession matrix.
+pub fn precess_j2000_to_mean_of_date(ra_j2000: f64, dec_j2000: f64, mjd: f64) -> (f64, f64) {
+    let (date1, date2) = mjd_to_jd_split(mjd);
+    let p_j2000 = eraS2c(ra_j2000, dec_j2000);
+    let rbp = eraPmat06(date1, date2);
+    let p_date = eraRxp(rbp, p_j2000);
+    let (ra_date, dec_date) = eraC2s(p_date);
+    (eraAnp(ra_date), dec_date)
+}
+
 // Calculate Greenwich Mean Sidereal Time (GMST) in radians from MJD
+#[allow(dead_code)]
 pub fn mjd_to_gmst(mjd: f64) -> f64 {
-    // Formula from Astronomical Almanac / IAU 2006.
-    // T is centuries from J2000.0 (JD 2451545.0, which is 2000-01-01 12:00:00 UT1).
-    let jd = mjd + 2400000.5;
-    let t_ut1 = (jd - 2451545.0) / 36525.0;
+    let (ut1a, ut1b) = mjd_to_jd_split(mjd);
+    // We do not have external UT1-UTC and TT-UTC here.
+    // For delay tracking, use the same split for UT1 and TT in ERFA.
+    eraAnp(eraGmst06(ut1a, ut1b, ut1a, ut1b))
+}
 
-    // GMST at J2000.0 (12h UT1) is 18h 41m 50.54841s (67310.54841s).
-    // The rate includes the 86400s per day rotation.
-    let gmst_sec = 67310.54841
-        + (876600.0 * 3600.0 + 8640184.812866) * t_ut1
-        + 0.093104 * t_ut1.powi(2)
-        - 6.2e-6 * t_ut1.powi(3);
-
-    let gmst_rad = (gmst_sec * std::f64::consts::PI / 43200.0) % (2.0 * std::f64::consts::PI);
-    if gmst_rad < 0.0 {
-        gmst_rad + 2.0 * std::f64::consts::PI
-    } else {
-        gmst_rad
-    }
+fn source_vector_itrs(ra: f64, dec: f64, mjd: f64) -> [f64; 3] {
+    // Mean-of-date equinox path:
+    // source coordinates are precessed to date, then rotated by apparent sidereal time.
+    let (ut1a, ut1b) = mjd_to_jd_split(mjd);
+    let gst = eraAnp(eraGst06a(ut1a, ut1b, ut1a, ut1b));
+    let ha = gst - ra;
+    let (sd, cd) = dec.sin_cos();
+    let (sh, ch) = ha.sin_cos();
+    [cd * ch, -cd * sh, sd]
 }
 
 // Helper function to calculate single antenna delay
@@ -251,15 +311,8 @@ fn calculate_single_antenna_delay(
     dec: f64, // radians
     mjd: f64,
 ) -> f64 {
-    let gmst = mjd_to_gmst(mjd);
-    let gast = gmst; // Approximation: GAST ~ GMST
-    let ha = gast - ra; // Greenwich Hour Angle
-
-    let s_x = dec.cos() * ha.cos();
-    let s_y = -1.0 * dec.cos() * ha.sin();
-    let s_z = dec.sin();
-
-    -1.0 * (ant_xyz[0] * s_x + ant_xyz[1] * s_y + ant_xyz[2] * s_z) / C
+    let s = source_vector_itrs(ra, dec, mjd);
+    -1.0 * (ant_xyz[0] * s[0] + ant_xyz[1] * s[1] + ant_xyz[2] * s[2]) / C
 }
 
 // Helper function to calculate baseline geometric delay directly.
@@ -271,21 +324,16 @@ fn calculate_baseline_delay(
     dec: f64,
     mjd: f64,
 ) -> f64 {
-    let gmst = mjd_to_gmst(mjd);
-    let gast = gmst;
-    let ha = gast - ra;
-
-    let s_x = dec.cos() * ha.cos();
-    let s_y = -1.0 * dec.cos() * ha.sin();
-    let s_z = dec.sin();
+    let s = source_vector_itrs(ra, dec, mjd);
 
     let bx = ant2_xyz[0] - ant1_xyz[0];
     let by = ant2_xyz[1] - ant1_xyz[1];
     let bz = ant2_xyz[2] - ant1_xyz[2];
 
-    -1.0 * (bx * s_x + by * s_y + bz * s_z) / C
+    -1.0 * (bx * s[0] + by * s[1] + bz * s[2]) / C
 }
 
+#[allow(dead_code)]
 pub fn calculate_antenna_delay_and_derivatives(
     ant_xyz: [f64; 3],
     ra: f64,  // radians
@@ -366,6 +414,13 @@ mod tests {
     fn parse_epoch_iso_is_utc_without_12h_offset() {
         let mjd = parse_epoch_to_mjd("2025-09-29T08:38:00Z").unwrap();
         assert!((mjd - 60947.35972222222).abs() < 1e-9);
+    }
+
+    #[test]
+    fn parse_epoch_supports_year_doy_format() {
+        let mjd = parse_epoch_to_mjd("2024/043 15:52:00").unwrap();
+        // 2024-02-12 15:52:00 UTC
+        assert!((mjd - 60352.66111111111).abs() < 1e-9);
     }
 
     #[test]
