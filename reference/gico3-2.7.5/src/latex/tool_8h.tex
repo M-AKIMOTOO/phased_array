@@ -1,0 +1,214 @@
+\hypertarget{tool_8h}{
+\section{tool.h File Reference}
+\label{tool_8h}\index{tool.h@{tool.h}}
+}
+{\ttfamily \#include $<$fftw3.h$>$}\par
+{\ttfamily \#include $<$xmmintrin.h$>$}\par
+\subsection*{Defines}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{tool_8h_a8ee6c74cd3348aa3f390e39de83c604b}{PHS\_\-DIV}~256
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{tool_8h_a309be3a1d864d93cfb9412dde9e6168d}{gico3\_\-init} ()
+\item 
+void \hyperlink{tool_8h_a0d9f9ac6dd8dc2e2c7b429fa0658c631}{gico3\_\-tone} (\_\-\_\-v4sf $\ast$vis\_\-x, \_\-\_\-v4sf $\ast$sum, int num)
+\item 
+void \hyperlink{tool_8h_ac496d1aa8f03db9aabbeaa15576cc40c}{gico3\_\-cross} (\_\-\_\-v4sf $\ast$vis\_\-x, \_\-\_\-v4sf $\ast$vis\_\-y, \_\-\_\-v4sf $\ast$sum, int num)
+\item 
+void \hyperlink{tool_8h_acb7ff24469ed9a8d50b8063676b5e160}{gico3\_\-track} (fftwf\_\-complex $\ast$in, fftwf\_\-complex $\ast$out, unsigned int phs0, unsigned int phs, int num)
+\item 
+void \hyperlink{tool_8h_abef077678130b45f29fb4d59b0c7e592}{float\_\-01bit\_\-01ch} (unsigned int $\ast$\hyperlink{common_8h_a1883823dc94f76a367d62151d71f4d24}{raw\_\-data}, float $\ast$sample, int num, int ch, float level\mbox{[}4\mbox{]})
+\item 
+void \hyperlink{tool_8h_a12a388a6884ba403b8e18833b039c8d5}{float\_\-01bit\_\-02ch} (unsigned int $\ast$\hyperlink{common_8h_a1883823dc94f76a367d62151d71f4d24}{raw\_\-data}, float $\ast$sample, int num, int ch, float level\mbox{[}4\mbox{]})
+\item 
+void \hyperlink{tool_8h_aeb32e28b67230ea799d7405040ca6bf9}{float\_\-01bit\_\-04ch} (unsigned int $\ast$\hyperlink{common_8h_a1883823dc94f76a367d62151d71f4d24}{raw\_\-data}, float $\ast$sample, int num, int ch, float level\mbox{[}4\mbox{]})
+\item 
+void \hyperlink{tool_8h_a9c03037d5e2930a1a9fe11f4f4f65ca8}{float\_\-01bit\_\-08ch} (unsigned int $\ast$\hyperlink{common_8h_a1883823dc94f76a367d62151d71f4d24}{raw\_\-data}, float $\ast$sample, int num, int ch, float level\mbox{[}4\mbox{]})
+\item 
+void \hyperlink{tool_8h_ae040a158d777579fe0e6fdd773048417}{float\_\-01bit\_\-16ch} (unsigned int $\ast$\hyperlink{common_8h_a1883823dc94f76a367d62151d71f4d24}{raw\_\-data}, float $\ast$sample, int num, int ch, float level\mbox{[}4\mbox{]})
+\item 
+void \hyperlink{tool_8h_af34f832cb5c3a5c10123e57554d04ae1}{float\_\-02bit\_\-01ch} (unsigned int $\ast$\hyperlink{common_8h_a1883823dc94f76a367d62151d71f4d24}{raw\_\-data}, float $\ast$sample, int num, int ch, float level\mbox{[}4\mbox{]})
+\item 
+void \hyperlink{tool_8h_acc5e50bfeeaab8945c301e41cf339f32}{float\_\-02bit\_\-02ch} (unsigned int $\ast$\hyperlink{common_8h_a1883823dc94f76a367d62151d71f4d24}{raw\_\-data}, float $\ast$sample, int num, int ch, float level\mbox{[}4\mbox{]})
+\item 
+void \hyperlink{tool_8h_ae7d1c4004c54e43abbcdf1886d88e63b}{float\_\-02bit\_\-04ch} (unsigned int $\ast$\hyperlink{common_8h_a1883823dc94f76a367d62151d71f4d24}{raw\_\-data}, float $\ast$sample, int num, int ch, float level\mbox{[}4\mbox{]})
+\item 
+void \hyperlink{tool_8h_af1f4c673515e398e0569062858601dc8}{float\_\-02bit\_\-08ch} (unsigned int $\ast$\hyperlink{common_8h_a1883823dc94f76a367d62151d71f4d24}{raw\_\-data}, float $\ast$sample, int num, int ch, float level\mbox{[}4\mbox{]})
+\item 
+void \hyperlink{tool_8h_a5c633d0a1ae389b2c3b75d92bad017d2}{float\_\-02bit\_\-16ch} (unsigned int $\ast$\hyperlink{common_8h_a1883823dc94f76a367d62151d71f4d24}{raw\_\-data}, float $\ast$sample, int num, int ch, float level\mbox{[}4\mbox{]})
+\item 
+void \hyperlink{tool_8h_aeab9fd55d9fd777b141b2e18dc1a5bb8}{vssp32\_\-01bit\_\-01ch} (unsigned int $\ast$\hyperlink{common_8h_a1883823dc94f76a367d62151d71f4d24}{raw\_\-data}, float $\ast$sample, int num, int ch, float level\mbox{[}4\mbox{]})
+\item 
+void \hyperlink{tool_8h_abc18a54a0b11cdaa6af8a12e58b8c208}{vssp32\_\-01bit\_\-04ch} (unsigned int $\ast$\hyperlink{common_8h_a1883823dc94f76a367d62151d71f4d24}{raw\_\-data}, float $\ast$sample, int num, int ch, float level\mbox{[}4\mbox{]})
+\item 
+void \hyperlink{tool_8h_acc0ade5b8a9e328a60efc70e6c05d6ae}{vssp32\_\-02bit\_\-01ch} (unsigned int $\ast$\hyperlink{common_8h_a1883823dc94f76a367d62151d71f4d24}{raw\_\-data}, float $\ast$sample, int num, int ch, float level\mbox{[}4\mbox{]})
+\item 
+void \hyperlink{tool_8h_aa342b6fa5d9cbbbdc83e26e134190738}{vssp32\_\-02bit\_\-04ch} (unsigned int $\ast$\hyperlink{common_8h_a1883823dc94f76a367d62151d71f4d24}{raw\_\-data}, float $\ast$sample, int num, int ch, float level\mbox{[}4\mbox{]})
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+float \hyperlink{tool_8h_aab39321be0a3226eb0a0519c4a29632c}{cos\_\-table} \mbox{[}PHS\_\-DIV\mbox{]}
+\item 
+float \hyperlink{tool_8h_a5e04b8e02316f3608225ef7afae99d82}{sin\_\-table} \mbox{[}PHS\_\-DIV\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Define Documentation}
+\hypertarget{tool_8h_a8ee6c74cd3348aa3f390e39de83c604b}{
+\index{tool.h@{tool.h}!PHS\_\-DIV@{PHS\_\-DIV}}
+\index{PHS\_\-DIV@{PHS\_\-DIV}!tool.h@{tool.h}}
+\subsubsection[{PHS\_\-DIV}]{\setlength{\rightskip}{0pt plus 5cm}\#define PHS\_\-DIV~256}}
+\label{tool_8h_a8ee6c74cd3348aa3f390e39de83c604b}
+
+
+Definition at line 7 of file tool.h.
+
+\subsection{Function Documentation}
+\hypertarget{tool_8h_abef077678130b45f29fb4d59b0c7e592}{
+\index{tool.h@{tool.h}!float\_\-01bit\_\-01ch@{float\_\-01bit\_\-01ch}}
+\index{float\_\-01bit\_\-01ch@{float\_\-01bit\_\-01ch}!tool.h@{tool.h}}
+\subsubsection[{float\_\-01bit\_\-01ch}]{\setlength{\rightskip}{0pt plus 5cm}void float\_\-01bit\_\-01ch (unsigned int $\ast$ {\em raw\_\-data}, \/  float $\ast$ {\em sample}, \/  int {\em num}, \/  int {\em ch}, \/  float {\em level}\mbox{[}4\mbox{]})}}
+\label{tool_8h_abef077678130b45f29fb4d59b0c7e592}
+
+
+Definition at line 45 of file tool.c.\hypertarget{tool_8h_a12a388a6884ba403b8e18833b039c8d5}{
+\index{tool.h@{tool.h}!float\_\-01bit\_\-02ch@{float\_\-01bit\_\-02ch}}
+\index{float\_\-01bit\_\-02ch@{float\_\-01bit\_\-02ch}!tool.h@{tool.h}}
+\subsubsection[{float\_\-01bit\_\-02ch}]{\setlength{\rightskip}{0pt plus 5cm}void float\_\-01bit\_\-02ch (unsigned int $\ast$ {\em raw\_\-data}, \/  float $\ast$ {\em sample}, \/  int {\em num}, \/  int {\em ch}, \/  float {\em level}\mbox{[}4\mbox{]})}}
+\label{tool_8h_a12a388a6884ba403b8e18833b039c8d5}
+
+
+Definition at line 46 of file tool.c.\hypertarget{tool_8h_aeb32e28b67230ea799d7405040ca6bf9}{
+\index{tool.h@{tool.h}!float\_\-01bit\_\-04ch@{float\_\-01bit\_\-04ch}}
+\index{float\_\-01bit\_\-04ch@{float\_\-01bit\_\-04ch}!tool.h@{tool.h}}
+\subsubsection[{float\_\-01bit\_\-04ch}]{\setlength{\rightskip}{0pt plus 5cm}void float\_\-01bit\_\-04ch (unsigned int $\ast$ {\em raw\_\-data}, \/  float $\ast$ {\em sample}, \/  int {\em num}, \/  int {\em ch}, \/  float {\em level}\mbox{[}4\mbox{]})}}
+\label{tool_8h_aeb32e28b67230ea799d7405040ca6bf9}
+
+
+Definition at line 47 of file tool.c.\hypertarget{tool_8h_a9c03037d5e2930a1a9fe11f4f4f65ca8}{
+\index{tool.h@{tool.h}!float\_\-01bit\_\-08ch@{float\_\-01bit\_\-08ch}}
+\index{float\_\-01bit\_\-08ch@{float\_\-01bit\_\-08ch}!tool.h@{tool.h}}
+\subsubsection[{float\_\-01bit\_\-08ch}]{\setlength{\rightskip}{0pt plus 5cm}void float\_\-01bit\_\-08ch (unsigned int $\ast$ {\em raw\_\-data}, \/  float $\ast$ {\em sample}, \/  int {\em num}, \/  int {\em ch}, \/  float {\em level}\mbox{[}4\mbox{]})}}
+\label{tool_8h_a9c03037d5e2930a1a9fe11f4f4f65ca8}
+
+
+Definition at line 48 of file tool.c.\hypertarget{tool_8h_ae040a158d777579fe0e6fdd773048417}{
+\index{tool.h@{tool.h}!float\_\-01bit\_\-16ch@{float\_\-01bit\_\-16ch}}
+\index{float\_\-01bit\_\-16ch@{float\_\-01bit\_\-16ch}!tool.h@{tool.h}}
+\subsubsection[{float\_\-01bit\_\-16ch}]{\setlength{\rightskip}{0pt plus 5cm}void float\_\-01bit\_\-16ch (unsigned int $\ast$ {\em raw\_\-data}, \/  float $\ast$ {\em sample}, \/  int {\em num}, \/  int {\em ch}, \/  float {\em level}\mbox{[}4\mbox{]})}}
+\label{tool_8h_ae040a158d777579fe0e6fdd773048417}
+
+
+Definition at line 49 of file tool.c.\hypertarget{tool_8h_af34f832cb5c3a5c10123e57554d04ae1}{
+\index{tool.h@{tool.h}!float\_\-02bit\_\-01ch@{float\_\-02bit\_\-01ch}}
+\index{float\_\-02bit\_\-01ch@{float\_\-02bit\_\-01ch}!tool.h@{tool.h}}
+\subsubsection[{float\_\-02bit\_\-01ch}]{\setlength{\rightskip}{0pt plus 5cm}void float\_\-02bit\_\-01ch (unsigned int $\ast$ {\em raw\_\-data}, \/  float $\ast$ {\em sample}, \/  int {\em num}, \/  int {\em ch}, \/  float {\em level}\mbox{[}4\mbox{]})}}
+\label{tool_8h_af34f832cb5c3a5c10123e57554d04ae1}
+
+
+Definition at line 51 of file tool.c.\hypertarget{tool_8h_acc5e50bfeeaab8945c301e41cf339f32}{
+\index{tool.h@{tool.h}!float\_\-02bit\_\-02ch@{float\_\-02bit\_\-02ch}}
+\index{float\_\-02bit\_\-02ch@{float\_\-02bit\_\-02ch}!tool.h@{tool.h}}
+\subsubsection[{float\_\-02bit\_\-02ch}]{\setlength{\rightskip}{0pt plus 5cm}void float\_\-02bit\_\-02ch (unsigned int $\ast$ {\em raw\_\-data}, \/  float $\ast$ {\em sample}, \/  int {\em num}, \/  int {\em ch}, \/  float {\em level}\mbox{[}4\mbox{]})}}
+\label{tool_8h_acc5e50bfeeaab8945c301e41cf339f32}
+
+
+Definition at line 52 of file tool.c.\hypertarget{tool_8h_ae7d1c4004c54e43abbcdf1886d88e63b}{
+\index{tool.h@{tool.h}!float\_\-02bit\_\-04ch@{float\_\-02bit\_\-04ch}}
+\index{float\_\-02bit\_\-04ch@{float\_\-02bit\_\-04ch}!tool.h@{tool.h}}
+\subsubsection[{float\_\-02bit\_\-04ch}]{\setlength{\rightskip}{0pt plus 5cm}void float\_\-02bit\_\-04ch (unsigned int $\ast$ {\em raw\_\-data}, \/  float $\ast$ {\em sample}, \/  int {\em num}, \/  int {\em ch}, \/  float {\em level}\mbox{[}4\mbox{]})}}
+\label{tool_8h_ae7d1c4004c54e43abbcdf1886d88e63b}
+
+
+Definition at line 53 of file tool.c.\hypertarget{tool_8h_af1f4c673515e398e0569062858601dc8}{
+\index{tool.h@{tool.h}!float\_\-02bit\_\-08ch@{float\_\-02bit\_\-08ch}}
+\index{float\_\-02bit\_\-08ch@{float\_\-02bit\_\-08ch}!tool.h@{tool.h}}
+\subsubsection[{float\_\-02bit\_\-08ch}]{\setlength{\rightskip}{0pt plus 5cm}void float\_\-02bit\_\-08ch (unsigned int $\ast$ {\em raw\_\-data}, \/  float $\ast$ {\em sample}, \/  int {\em num}, \/  int {\em ch}, \/  float {\em level}\mbox{[}4\mbox{]})}}
+\label{tool_8h_af1f4c673515e398e0569062858601dc8}
+
+
+Definition at line 54 of file tool.c.\hypertarget{tool_8h_a5c633d0a1ae389b2c3b75d92bad017d2}{
+\index{tool.h@{tool.h}!float\_\-02bit\_\-16ch@{float\_\-02bit\_\-16ch}}
+\index{float\_\-02bit\_\-16ch@{float\_\-02bit\_\-16ch}!tool.h@{tool.h}}
+\subsubsection[{float\_\-02bit\_\-16ch}]{\setlength{\rightskip}{0pt plus 5cm}void float\_\-02bit\_\-16ch (unsigned int $\ast$ {\em raw\_\-data}, \/  float $\ast$ {\em sample}, \/  int {\em num}, \/  int {\em ch}, \/  float {\em level}\mbox{[}4\mbox{]})}}
+\label{tool_8h_a5c633d0a1ae389b2c3b75d92bad017d2}
+
+
+Definition at line 55 of file tool.c.\hypertarget{tool_8h_ac496d1aa8f03db9aabbeaa15576cc40c}{
+\index{tool.h@{tool.h}!gico3\_\-cross@{gico3\_\-cross}}
+\index{gico3\_\-cross@{gico3\_\-cross}!tool.h@{tool.h}}
+\subsubsection[{gico3\_\-cross}]{\setlength{\rightskip}{0pt plus 5cm}void gico3\_\-cross (\_\-\_\-v4sf $\ast$ {\em vis\_\-x}, \/  \_\-\_\-v4sf $\ast$ {\em vis\_\-y}, \/  \_\-\_\-v4sf $\ast$ {\em sum}, \/  int {\em num})}}
+\label{tool_8h_ac496d1aa8f03db9aabbeaa15576cc40c}
+
+
+Definition at line 10 of file tool.c.\hypertarget{tool_8h_a309be3a1d864d93cfb9412dde9e6168d}{
+\index{tool.h@{tool.h}!gico3\_\-init@{gico3\_\-init}}
+\index{gico3\_\-init@{gico3\_\-init}!tool.h@{tool.h}}
+\subsubsection[{gico3\_\-init}]{\setlength{\rightskip}{0pt plus 5cm}void gico3\_\-init ()}}
+\label{tool_8h_a309be3a1d864d93cfb9412dde9e6168d}
+
+
+Definition at line 8 of file tool.c.\hypertarget{tool_8h_a0d9f9ac6dd8dc2e2c7b429fa0658c631}{
+\index{tool.h@{tool.h}!gico3\_\-tone@{gico3\_\-tone}}
+\index{gico3\_\-tone@{gico3\_\-tone}!tool.h@{tool.h}}
+\subsubsection[{gico3\_\-tone}]{\setlength{\rightskip}{0pt plus 5cm}void gico3\_\-tone (\_\-\_\-v4sf $\ast$ {\em vis\_\-x}, \/  \_\-\_\-v4sf $\ast$ {\em sum}, \/  int {\em num})}}
+\label{tool_8h_a0d9f9ac6dd8dc2e2c7b429fa0658c631}
+
+
+Definition at line 18 of file tool.c.\hypertarget{tool_8h_acb7ff24469ed9a8d50b8063676b5e160}{
+\index{tool.h@{tool.h}!gico3\_\-track@{gico3\_\-track}}
+\index{gico3\_\-track@{gico3\_\-track}!tool.h@{tool.h}}
+\subsubsection[{gico3\_\-track}]{\setlength{\rightskip}{0pt plus 5cm}void gico3\_\-track (fftwf\_\-complex $\ast$ {\em in}, \/  fftwf\_\-complex $\ast$ {\em out}, \/  unsigned int {\em phs0}, \/  unsigned int {\em phs}, \/  int {\em num})}}
+\label{tool_8h_acb7ff24469ed9a8d50b8063676b5e160}
+
+
+Definition at line 35 of file tool.c.\hypertarget{tool_8h_aeab9fd55d9fd777b141b2e18dc1a5bb8}{
+\index{tool.h@{tool.h}!vssp32\_\-01bit\_\-01ch@{vssp32\_\-01bit\_\-01ch}}
+\index{vssp32\_\-01bit\_\-01ch@{vssp32\_\-01bit\_\-01ch}!tool.h@{tool.h}}
+\subsubsection[{vssp32\_\-01bit\_\-01ch}]{\setlength{\rightskip}{0pt plus 5cm}void vssp32\_\-01bit\_\-01ch (unsigned int $\ast$ {\em raw\_\-data}, \/  float $\ast$ {\em sample}, \/  int {\em num}, \/  int {\em ch}, \/  float {\em level}\mbox{[}4\mbox{]})}}
+\label{tool_8h_aeab9fd55d9fd777b141b2e18dc1a5bb8}
+
+
+Definition at line 57 of file tool.c.\hypertarget{tool_8h_abc18a54a0b11cdaa6af8a12e58b8c208}{
+\index{tool.h@{tool.h}!vssp32\_\-01bit\_\-04ch@{vssp32\_\-01bit\_\-04ch}}
+\index{vssp32\_\-01bit\_\-04ch@{vssp32\_\-01bit\_\-04ch}!tool.h@{tool.h}}
+\subsubsection[{vssp32\_\-01bit\_\-04ch}]{\setlength{\rightskip}{0pt plus 5cm}void vssp32\_\-01bit\_\-04ch (unsigned int $\ast$ {\em raw\_\-data}, \/  float $\ast$ {\em sample}, \/  int {\em num}, \/  int {\em ch}, \/  float {\em level}\mbox{[}4\mbox{]})}}
+\label{tool_8h_abc18a54a0b11cdaa6af8a12e58b8c208}
+
+
+Definition at line 58 of file tool.c.\hypertarget{tool_8h_acc0ade5b8a9e328a60efc70e6c05d6ae}{
+\index{tool.h@{tool.h}!vssp32\_\-02bit\_\-01ch@{vssp32\_\-02bit\_\-01ch}}
+\index{vssp32\_\-02bit\_\-01ch@{vssp32\_\-02bit\_\-01ch}!tool.h@{tool.h}}
+\subsubsection[{vssp32\_\-02bit\_\-01ch}]{\setlength{\rightskip}{0pt plus 5cm}void vssp32\_\-02bit\_\-01ch (unsigned int $\ast$ {\em raw\_\-data}, \/  float $\ast$ {\em sample}, \/  int {\em num}, \/  int {\em ch}, \/  float {\em level}\mbox{[}4\mbox{]})}}
+\label{tool_8h_acc0ade5b8a9e328a60efc70e6c05d6ae}
+
+
+Definition at line 59 of file tool.c.\hypertarget{tool_8h_aa342b6fa5d9cbbbdc83e26e134190738}{
+\index{tool.h@{tool.h}!vssp32\_\-02bit\_\-04ch@{vssp32\_\-02bit\_\-04ch}}
+\index{vssp32\_\-02bit\_\-04ch@{vssp32\_\-02bit\_\-04ch}!tool.h@{tool.h}}
+\subsubsection[{vssp32\_\-02bit\_\-04ch}]{\setlength{\rightskip}{0pt plus 5cm}void vssp32\_\-02bit\_\-04ch (unsigned int $\ast$ {\em raw\_\-data}, \/  float $\ast$ {\em sample}, \/  int {\em num}, \/  int {\em ch}, \/  float {\em level}\mbox{[}4\mbox{]})}}
+\label{tool_8h_aa342b6fa5d9cbbbdc83e26e134190738}
+
+
+Definition at line 60 of file tool.c.
+
+\subsection{Variable Documentation}
+\hypertarget{tool_8h_aab39321be0a3226eb0a0519c4a29632c}{
+\index{tool.h@{tool.h}!cos\_\-table@{cos\_\-table}}
+\index{cos\_\-table@{cos\_\-table}!tool.h@{tool.h}}
+\subsubsection[{cos\_\-table}]{\setlength{\rightskip}{0pt plus 5cm}float {\bf cos\_\-table}\mbox{[}PHS\_\-DIV\mbox{]}}}
+\label{tool_8h_aab39321be0a3226eb0a0519c4a29632c}
+
+
+Definition at line 9 of file tool.h.\hypertarget{tool_8h_a5e04b8e02316f3608225ef7afae99d82}{
+\index{tool.h@{tool.h}!sin\_\-table@{sin\_\-table}}
+\index{sin\_\-table@{sin\_\-table}!tool.h@{tool.h}}
+\subsubsection[{sin\_\-table}]{\setlength{\rightskip}{0pt plus 5cm}float {\bf sin\_\-table}\mbox{[}PHS\_\-DIV\mbox{]}}}
+\label{tool_8h_a5e04b8e02316f3608225ef7afae99d82}
+
+
+Definition at line 9 of file tool.h.

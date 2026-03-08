@@ -1,0 +1,12 @@
+*.png
+*.pdf
+*.ps
+*.txt
+*.xml
+target
+raw
+cor
+xml
+phased_array
+src-20260306.zip
+

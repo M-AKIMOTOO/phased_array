@@ -1,0 +1,127 @@
+                                                                                                                                                                        
+void Read1SecElecs(int index) // currently only for elecs VdIF format 1ch                                                                                                                
+{                                                                                                                                                                                        
+  time_t raw_epoch[MAX_STATION];size_t size;long long ss;unsigned int table[4][256];unsigned char *adr;                                                                                  
+  FILE *fp[MAX_STATION];struct stat buf;struct tm tm;char time_code[32],name[256];int ret,page;off_t len[MAX_STATION];long long s0,s1;struct timeval st,et;double sec,speed;             
+                                                                                                                                                                                         
+  long long framenum,frame, cluster;long posinframe;size_t vdifsize;// 2015 jul 10 add by KT                                                                                             
+  long cluster_size = 102300; //                                                                                                                                                         
+  VDIF vdif_header; long total_jump[MAX_STATION]; int t ; for(t = 0 ; t<index ; t++) total_jump[index]=0;                                                                                
+                                                                                                                                                                                         
+ for(index=0;(index<MAX_STATION)&&(strlen(station[index].name));index++){                                                                                                                
+                                                                                                                                                                                         
+    sprintf(name,"%s/%s",RAW_FILE,raw_name[index]);if(strchr(raw_name[index],'_')!=NULL) if(strptime(strchr(raw_name[index],'_'),"_%Y%j%H%M%S",&tm)!=NULL) raw_epoch[index]=mktime(&tm);\
+raw_epoch[index]=process.epoch;                                                                                                                                                          
+    ret      = stat(name,&buf);if(      ret==  -1) {fprintf(stdout,"GICO3 : [ERROR]   stat('%s/%s') -> %s <%s:%d>\n",RAW_FILE,raw_name[index],strerror(errno),__FILE__,__LINE__);exit(0)\
+;} else len[index]=buf.st_size/4;                                                                                                                                                        
+    fp[index]=fopen(name, "r");if(fp[index]==NULL) {fprintf(stdout,"GICO3 : [ERROR]  fopen('%s/%s') -> %s <%s:%d>\n",RAW_FILE,raw_name[index],strerror(errno),__FILE__,__LINE__);exit(0)\
+;}                                                                                                                                                                                       
+    size     = 4*Speed(terminal[index])*(1+2*MAX_DELAY)*2+4096;                                                                                                                          
+    vdifsize = 4*Speed(terminal[index])*(1+2*MAX_DELAY)*(1312.0/1280.0)+128*2+4096; // vdif frame size / original vsi size = 1312 / 1280                                                 
+    //size=268804096 vdifsize=275524352                                                                                                                                                  
+    for(page=0;page<MAX_BUFFER;page++) {                                                                                                                                                 
+      if((raw_data[page][index]=malloc(size))==NULL ) { fprintf(stdout,"GICO3 : [ERROR] malloc('%s/%s') -> %s <%s:%d>\n",RAW_FILE,raw_name[index],strerror(errno),__FILE__,__LINE__);exi\
+t(0);      }                                                                                                                                                                             
+      if((raw_buffer[page][index]=malloc(vdifsize))==NULL) {    fprintf(stdout,"GICO3 : [ERROR] malloc('%s/%s') -> %s <%s:%d>\n",RAW_FILE,raw_name[index],strerror(errno),__FILE__,__LIN\
+E__);exit(0);      }                                                                                                                                                                     
+      // 2015 jul 10 add by KT                                                                                                                                                           
+    }// for page                               
+
+                                                                                                                                                                      
+  }// for index                                                                                                                                                                          
+  // add skip by KT 2015 11 jun                                                                                                                                                          
+                                                                                                                                                                                         
+  for(READ_EPOCH=process.epoch+process.skip;READ_EPOCH<process.epoch+process.length;READ_EPOCH++){                                                                                       
+    for(index=0;(index<MAX_STATION)&&(strlen(station[index].name));index++){                                                                                                             
+                                                                                                                                                                                         
+      s0=Min(Max(Speed(terminal[index])*((READ_EPOCH-raw_epoch[index]-MAX_DELAY+0)+cdata[index].delay),0),len[index]);//ÆÉ¤ß½Ð¤·³«»Ï¥¢¥É¥ì¥¹                                             
+      s1=Min(Max(Speed(terminal[index])*((READ_EPOCH-raw_epoch[index]+MAX_DELAY+1)+cdata[index].delay),0),len[index]);//ÆÉ¤ß½Ð¤·½ªÎ»¥¢¥É¥ì¥¹                                             
+      gmtime_r(&READ_EPOCH,&tm);strftime(time_code,sizeof(time_code),"%Y/%j %H:%M:%S",&tm);page=READ_EPOCH%MAX_BUFFER;while(CURRENT_EPOCH+MAX_BUFFER<=READ_EPOCH) usleep(10000);gettimeo\
+fday(&st,NULL);                                                                                                                                                                          
+                                                                                                                                                                                         
+      // 1  decide cluster and frame number                                                                                                                                              
+      framenum = (320.0+s0)/320.0;   posinframe = (s0%320)*4; cluster = framenum/cluster_size; // cluster = (4.0*s0)/(8.0*pow(16,6)) ;                                                   
+      if(message>=2 ) fprintf(stdout,"GICO3 : [level-2] VDIF[index=%2d ,cluster= %6d,frameNUM=%6d, posinframe=%6d s0by=%15ld s1by=%15ld seek=%15ld unit]\n",index,cluster,framenum,posin\
+frame,4*s0,4*s1,((framenum)*1312+cluster*128));                                                                                                                                          
+      // 2  read frame unit f0 and f1    
+               
+
+
+
+
+
+     // 2  read frame unit f0 and f1                                                                                                                                                    
+      if(fseek(            fp[index],framenum*1312+cluster*128  ,SEEK_SET)!=    0) {fprintf(stdout,"GICO3 : [ERROR]  fseek('%s/%s') -> %s <%s:%d>\n",RAW_FILE,raw_name[index],strerror(e\
+rrno),__FILE__,__LINE__);exit(0);}                                                                                                                                                       
+                                                                                                                                                                                         
+      frame = (320.0+(s1-s0))/320.0;       cluster = frame/cluster_size;  long long readsize = (frame*1312+cluster*128)/4 ;                                                              
+      if(message>=2) fprintf(stdout,"GICO3 : [level-2] VDIF[index=%2d, sub cluster= %6d,frame=%6d, read=%12d [unit]]\n",index, cluster,frame,(frame*1312+cluster*128));                  
+                                                                                                                                                                                         
+      if(fread(raw_buffer[page][index],4,readsize,fp[index]) != readsize ) {fprintf(stdout,"GICO3 : [ERROR]  fread('%s/%s') -> %s <%s:%d>\n",RAW_FILE,raw_name[index],strerror(errno),__\
+FILE__,__LINE__);exit(0);}                                                                                                                                                               
+                                                                                                                                                                                         
+      // 3  extract data without header ( offset byte of f0 and f1                                                                                                                       
+      unsigned int current_sec        = READ_EPOCH;                                                                                                                                      
+      time_t            initial_sec   = process.epoch+process.skip;                                                                                                                      
+      int               header_size   = 8 ;     // 4byte unit 32 byte                                                                                                                    
+      int               frame_size    = 328;    // 4byte unit 1312byte                                                                                                                   
+      int               vsi_size      = frame_size-header_size; // 320 unit                                                                                                              
+      int               dummy         = 32;     // 4byte unit 128byte                                                                                                                    
+      int               frame_pos     = posinframe/4.0;                                                                                                                                  
+      long              diff_vsi_size = vsi_size - frame_pos;                                                                                                                            
+      long pos                        = 0, p1=0;        //frame_pos;                                                                                                                     
+      long              jump          = 0 ;                                                                                                                                              
+      unsigned int      next_frame    = 0 ;                                                                                                                                              
+      unsigned int      current_frame;  // current_frame is 200000 unit                                                                                                                  
+      current_frame                   = ((char*)raw_buffer[page][index][1]); current_frame = current_frame & 0x00FFFFFF;                                                                 
+                                                                                                                                                                                         
+      //      total_jump[index] = (current_sec-initial_sec)*200000+(framenum-current_frame); // +1 means blanc the first frame of elecs data                                             
+      if(message>=2){ fprintf(stdout,"GICO3:[level-2]VDIF[ sec = %d current_frame = %d total_frame= %10d jump= %10d]\n" ,(current_sec-initial_sec), current_frame, framenum, total_jump[\
+index]) ;}                                                                                                                                                                               
+      pos += (total_jump[index]*vsi_size); // shift due to packet loss data for next second data                                                                                         
+      //////////////////////////////////////////////////////////                                                                                                                         
+  
+    //////////////////////////////////////////////////////////                                                                                                                         
+      for(ss=header_size+frame_pos ; ss<readsize ; ss++){                                                                                                                                
+        if( p1 == diff_vsi_size ){        ss += header_size;   framenum++;                                                                                                               
+          next_frame = ((char*)raw_buffer[page][index][ss-7]); next_frame = next_frame & 0x00FFFFFF;                                                                                     
+          if( (framenum % cluster_size)      == 0 ){  ss+=dummy;  // elecs data 102300 frame blank 32*4 byte data                                                                        
+            next_frame = ((char*)raw_buffer[page][index][ss-7]); next_frame = next_frame & 0x00FFFFFF;                                                                                   
+          }// if framenum %                                                                                                                                                              
+                                                                                                                                                                                         
+          jump=(next_frame-1)-current_frame; // calc jump                                                                                                                                
+                                                                                                                                                                                         
+          if(current_frame+1 == next_frame || current_frame+1 == next_frame+200000 ){                                                                                                    
+          }else{ // data loss  due to recording error                                                                                                                                    
+            if( next_frame > current_frame ){                                                                                                                                            
+              pos += (jump*vsi_size); // shift due to jump                                                                                                                               
+              total_jump[index] += jump; // accumlate jump packet loss                                                                                                                   
+            }                                                                                                                                                                            
+            if( next_frame < current_frame ){         fprintf(stdout,"ERROR elecs data has some errors! ]\n" );      exit(1);       }                                                    
+          }// if else                                                                                                                                                                    
+          current_frame=next_frame;                                                                                                                                                      
+        }// p1=diff_vsi_size                                                                                                                                                             
+        if( p1==vsi_size ){       p1 = 0;       }                                                                                                                                        
+      raw_data[page][index][pos++] = raw_buffer[page][index][ss]; p1++;                                                                                                                  
+      }                                                                                                                                                                                  
+      adr=raw_data[page][index];memcpy(table,shuffle_table[index],sizeof(table));for(ss=0;ss<s1-s0;ss++) raw_data[page][index][ss]=(table[0][adr[4*ss+0]] | table[1][adr[4*ss+1]] | tabl\
+e[2][adr[4*ss+2]] | table[3][adr[4*ss+3]]);                                                                                                                                              
+                                                                                                                                                                                         
+      gettimeofday(&et,NULL);raw_offset[page][index]=s0-Speed(terminal[index])*(READ_EPOCH-raw_epoch[index]);raw_length[page][index]=s1-s0;sec=(et.tv_sec-st.tv_sec)+0.000001*(et.tv_use\
+c-st.tv_usec);speed=32*(s1-s0)/1000000.0/sec;                                                                                                                                            
+      if(message>=2) fprintf(stdout,"GICO3 : [level-2] fread[File='%26s',epoch='%s',offset=%12Ld,length=%8Ld BitRate=%4.0lfMbps]\n",raw_name[index],time_code,s0,s1-s0,speed);           
+    } // for index                                                                                                                                                                       
+  }// for READ_EPOCH                                                                                                                                                                     
+                                                                                                                                                                                         
+  while(CURRENT_EPOCH!=READ_EPOCH) usleep(10000);for(index=0;(index<MAX_STATION)&&(strlen(station[index].name));index++) {fclose(fp[index]);for(page=0;page<MAX_BUFFER;page++){ free(raw\
+_data[page][index]);free(raw_buffer[page][index]);}}                                                                                                                                     
+                                                                                                                                                                                         
+}                                                                                                                                                                                        
+                                                                                                                                                                                         
+                                                                                                                                                                                         
+             
+
+
+
+
+

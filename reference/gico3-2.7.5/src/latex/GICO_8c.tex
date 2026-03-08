@@ -1,0 +1,96 @@
+\hypertarget{GICO_8c}{
+\section{GICO.c File Reference}
+\label{GICO_8c}\index{GICO.c@{GICO.c}}
+}
+{\ttfamily \#include $<$stdlib.h$>$}\par
+{\ttfamily \#include $<$string.h$>$}\par
+{\ttfamily \#include $<$math.h$>$}\par
+{\ttfamily \#include $<$pthread.h$>$}\par
+{\ttfamily \#include $<$sys/mman.h$>$}\par
+{\ttfamily \#include $<$sys/types.h$>$}\par
+{\ttfamily \#include $<$sys/stat.h$>$}\par
+{\ttfamily \#include $<$unistd.h$>$}\par
+{\ttfamily \#include $<$sys/time.h$>$}\par
+{\ttfamily \#include $<$errno.h$>$}\par
+{\ttfamily \#include \char`\"{}GICO.h\char`\"{}}\par
+{\ttfamily \#include \char`\"{}GICO3.h\char`\"{}}\par
+{\ttfamily \#include \char`\"{}param.h\char`\"{}}\par
+{\ttfamily \#include \char`\"{}apri.h\char`\"{}}\par
+{\ttfamily \#include \char`\"{}read.h\char`\"{}}\par
+{\ttfamily \#include \char`\"{}common.h\char`\"{}}\par
+\subsection*{Defines}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{GICO_8c_a78c99ffd76a7bb3c8c74db76207e9ab4}{\_\-XOPEN\_\-SOURCE}~600
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{GICO_8c_af013685fff08b1f451f617b91f83bea5}{WRITE} ()
+\item 
+void \hyperlink{GICO_8c_a5196676a82460c2013c172f4e438779f}{OPEN} ()
+\item 
+void \hyperlink{GICO_8c_a96b22d1604c1a190e26938f18058ead5}{GeoInit} ()
+\item 
+void \hyperlink{GICO_8c_a48c6525ebc51ec1985ad79411c961a65}{GeoFree} ()
+\item 
+\hyperlink{structClock}{Clock} \hyperlink{GICO_8c_a369a18076bd57dc945fb5c256643f596}{find} (int station\_\-index, int stream\_\-index, time\_\-t epoch)
+\item 
+void \hyperlink{GICO_8c_a6c65ea29f662c37ff0e8a5aaba16663b}{GICO} (\hyperlink{structProcess}{Process} \hyperlink{common_8h_afd863a81383d428e30e0dddac1471288}{process})
+\end{DoxyCompactItemize}
+
+
+\subsection{Define Documentation}
+\hypertarget{GICO_8c_a78c99ffd76a7bb3c8c74db76207e9ab4}{
+\index{GICO.c@{GICO.c}!\_\-XOPEN\_\-SOURCE@{\_\-XOPEN\_\-SOURCE}}
+\index{\_\-XOPEN\_\-SOURCE@{\_\-XOPEN\_\-SOURCE}!GICO.c@{GICO.c}}
+\subsubsection[{\_\-XOPEN\_\-SOURCE}]{\setlength{\rightskip}{0pt plus 5cm}\#define \_\-XOPEN\_\-SOURCE~600}}
+\label{GICO_8c_a78c99ffd76a7bb3c8c74db76207e9ab4}
+
+
+Definition at line 1 of file GICO.c.
+
+\subsection{Function Documentation}
+\hypertarget{GICO_8c_a369a18076bd57dc945fb5c256643f596}{
+\index{GICO.c@{GICO.c}!find@{find}}
+\index{find@{find}!GICO.c@{GICO.c}}
+\subsubsection[{find}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Clock} find (int {\em station\_\-index}, \/  int {\em stream\_\-index}, \/  time\_\-t {\em epoch})}}
+\label{GICO_8c_a369a18076bd57dc945fb5c256643f596}
+
+
+Definition at line 107 of file GICO.c.\hypertarget{GICO_8c_a48c6525ebc51ec1985ad79411c961a65}{
+\index{GICO.c@{GICO.c}!GeoFree@{GeoFree}}
+\index{GeoFree@{GeoFree}!GICO.c@{GICO.c}}
+\subsubsection[{GeoFree}]{\setlength{\rightskip}{0pt plus 5cm}void GeoFree ()}}
+\label{GICO_8c_a48c6525ebc51ec1985ad79411c961a65}
+
+
+Definition at line 101 of file GICO.c.\hypertarget{GICO_8c_a96b22d1604c1a190e26938f18058ead5}{
+\index{GICO.c@{GICO.c}!GeoInit@{GeoInit}}
+\index{GeoInit@{GeoInit}!GICO.c@{GICO.c}}
+\subsubsection[{GeoInit}]{\setlength{\rightskip}{0pt plus 5cm}void GeoInit ()}}
+\label{GICO_8c_a96b22d1604c1a190e26938f18058ead5}
+
+
+Definition at line 80 of file GICO.c.\hypertarget{GICO_8c_a6c65ea29f662c37ff0e8a5aaba16663b}{
+\index{GICO.c@{GICO.c}!GICO@{GICO}}
+\index{GICO@{GICO}!GICO.c@{GICO.c}}
+\subsubsection[{GICO}]{\setlength{\rightskip}{0pt plus 5cm}void GICO ({\bf Process} {\em process})}}
+\label{GICO_8c_a6c65ea29f662c37ff0e8a5aaba16663b}
+
+
+Definition at line 124 of file GICO.c.\hypertarget{GICO_8c_a5196676a82460c2013c172f4e438779f}{
+\index{GICO.c@{GICO.c}!OPEN@{OPEN}}
+\index{OPEN@{OPEN}!GICO.c@{GICO.c}}
+\subsubsection[{OPEN}]{\setlength{\rightskip}{0pt plus 5cm}void OPEN ()}}
+\label{GICO_8c_a5196676a82460c2013c172f4e438779f}
+
+
+Definition at line 46 of file GICO.c.\hypertarget{GICO_8c_af013685fff08b1f451f617b91f83bea5}{
+\index{GICO.c@{GICO.c}!WRITE@{WRITE}}
+\index{WRITE@{WRITE}!GICO.c@{GICO.c}}
+\subsubsection[{WRITE}]{\setlength{\rightskip}{0pt plus 5cm}int WRITE ()}}
+\label{GICO_8c_af013685fff08b1f451f617b91f83bea5}
+
+
+Definition at line 20 of file GICO.c.
